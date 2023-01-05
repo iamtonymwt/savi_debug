@@ -1,2 +1,5 @@
 #pycache
-/__pycache__/
+__pycache__*
+
+#experiments
+/experiments*

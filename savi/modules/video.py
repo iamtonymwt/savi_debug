@@ -124,7 +124,7 @@ class SAVi(nn.Module):
         y = self.encoder(x)
         encoded_inputs = y.reshape(shape=(B, T, *y.shape[-3:]))
         
-
+        '''
         if continue_from_previous_state:
             assert conditioning is not None, (
                 "When continuing from a previous state, the state has to be passed "
@@ -136,6 +136,7 @@ class SAVi(nn.Module):
             # same as above but without encoded inputs.
             init_slots = self.initializer(
                 conditioning, batch_size=video.shape[0])
+        '''
 
         # Scan recurrent processor over encoded inputs along sequence dimension.
         # # TODO: make this over t time steps. for loop ?
@@ -160,6 +161,7 @@ class SAVi(nn.Module):
         # all slots over all time.
 
         # TODO: do the decoding all at once instead of per-timestep like done here.
+        '''
         outputs, outputs_pred, attn = None, None, None
         slots_corrected_list, slots_predicted_list, attn_list = [], [], []
         predicted_slots = init_slots
@@ -180,12 +182,12 @@ class SAVi(nn.Module):
         corrected_slots = torch.cat(slots_corrected_list, dim=1)
         predicted_slots = torch.cat(slots_predicted_list, dim=1)
         attn = torch.cat(attn_list, dim=1)
-        
+        '''        
 
         # Decode latent states
         #corrected_slots.flatten(0,1) (b*s,8,128)
-        outputs = self.decoder(corrected_slots.flatten(0,1)) if self.decode_corrected else None
-        outputs_pred = self.decoder(predicted_slots.flatten(0,1)) if self.decode_predicted else None
+        outputs = self.decoder(encoded_inputs.flatten(0,1)) if self.decode_corrected else None
+        outputs_pred = self.decoder(encoded_inputs.flatten(0,1)) if self.decode_predicted else None
 
         if outputs is not None:
             for key, value in outputs.items():
@@ -193,6 +195,15 @@ class SAVi(nn.Module):
         if outputs_pred is not None:
             for key, value in outputs_pred.items():
                 outputs_pred[key] = value.reshape(B, T, *value.shape[1:])
+
+        predicted_slots = np.zeros([B,T,8,256])
+        predicted_slots = torch.from_numpy(predicted_slots)
+        predicted_slots = predicted_slots.cuda()
+        
+        attn = np.zeros([B,T,8,64,80])
+        attn = torch.from_numpy(attn)
+        attn = attn.cuda()
+
 
         return {
             # "states": corrected_slots,

@@ -560,18 +560,18 @@ class SemiLoss(nn.Module):
 		video, boxes, segmentations, gt_flow, padding_mask, mask, label = batch
 		batch = (video, boxes, segmentations, gt_flow, padding_mask, mask)
 				
-		recon = self.reconloss(model_outputs, batch, label)
-		recon = recon.mean()
+		#recon = self.reconloss(model_outputs, batch, label)
+		#recon = recon.mean()
 		
 		focal = self.focalloss(model_outputs, batch, label)
 			
-		loss = recon*0.3 + focal*0.7
+		#loss = recon*0.3 + focal*0.7
 		
-		#recon = 0
-		#recon = np.array(recon)
-		#recon = torch.from_numpy(recon)
-		#recon = recon.cuda()
-		#loss = focal
+		recon = 0
+		recon = np.array(recon)
+		recon = torch.from_numpy(recon)
+		recon = recon.cuda()
+		loss = focal
 		
 		return loss, recon, focal
 

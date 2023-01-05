@@ -247,10 +247,11 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 			optimizer.zero_grad(set_to_none=True)
 
 			loss.backward()
-			#for name,weight in model.named_parameters():
-				#if weight.requires_grad and weight.grad == None:
+			for name,weight in model.named_parameters():
+				if weight.requires_grad and weight.grad != None:
 					#print("name: ",name,"weight_grad: ",weight.grad)
-			#sys.exit(1)
+					print("name: ",name)
+			sys.exit(1)
 			# clip grad norm
 			# TODO: fix grad norm clipping, as it's making the loss NaN
 			if max_norm is not None:
